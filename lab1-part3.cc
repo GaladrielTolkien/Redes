@@ -45,7 +45,6 @@ main (int argc, char *argv[])
   NetDeviceContainer p2pDevices;
   p2pDevices = pointToPoint.Install (p2pNodes);
 
-  // Rede WiFi 1 (Esquerda)
   NodeContainer wifiStaNodes1;
   wifiStaNodes1.Create (nWifi);
   NodeContainer wifiApNode1 = p2pNodes.Get (0);
@@ -55,7 +54,6 @@ main (int argc, char *argv[])
   phy1.SetChannel (channel1.Create ());
 
   WifiHelper wifi;
-  // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
 
   WifiMacHelper mac1;
   Ssid ssid = Ssid ("ns3-ssid-1");
@@ -65,7 +63,7 @@ main (int argc, char *argv[])
   mac1.SetType ("ns3::ApWifiMac", "Ssid", SsidValue (ssid));
   NetDeviceContainer apDevices1 = wifi.Install (phy1, mac1, wifiApNode1);
 
-  // Rede WiFi 2 (Direita) - substituindo a CSMA
+
   NodeContainer wifiStaNodes2;
   wifiStaNodes2.Create (nWifi);
   NodeContainer wifiApNode2 = p2pNodes.Get (1);
@@ -82,7 +80,6 @@ main (int argc, char *argv[])
   mac2.SetType ("ns3::ApWifiMac", "Ssid", SsidValue (ssid));
   NetDeviceContainer apDevices2 = wifi.Install (phy2, mac2, wifiApNode2);
 
-  // Mobilidade para ambas as redes WiFi
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
                                   "MinX", DoubleValue (0.0),
@@ -100,13 +97,11 @@ main (int argc, char *argv[])
   mobility.Install (wifiApNode1);
   mobility.Install (wifiApNode2);
 
-  // Instalação da pilha de protocolos
   InternetStackHelper stack;
   stack.Install (p2pNodes);
   stack.Install (wifiStaNodes1);
   stack.Install (wifiStaNodes2);
-  
-  // Atribuição de Endereços IP
+
   Ipv4AddressHelper address;
   address.SetBase ("10.1.1.0", "255.255.255.0");
   address.Assign (p2pDevices);
@@ -119,7 +114,6 @@ main (int argc, char *argv[])
   Ipv4InterfaceContainer staInterfaces2 = address.Assign (staDevices2);
   address.Assign (apDevices2);
 
-  // Aplicações
   UdpEchoServerHelper echoServer (9);
   ApplicationContainer serverApps = echoServer.Install (wifiStaNodes2.Get (nWifi - 1));
   serverApps.Start (Seconds (1.0));
@@ -133,8 +127,7 @@ main (int argc, char *argv[])
   ApplicationContainer clientApps = echoClient.Install (wifiStaNodes1.Get (nWifi - 1));
   clientApps.Start (Seconds (2.0));
   clientApps.Stop (Seconds (25.0));
-  
-  // Roteamento e Simulação
+
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
   Simulator::Stop (Seconds (25.0));
